@@ -1,4 +1,4 @@
-# Difference between @Controller and @RestController
+# 1. Difference between @Controller and @RestController
 Ans: @RestController combines both @Controller and @ResponseBody. 
      @ResponseBody is useful for serialization of java object to httpResponse.
      while using @Controller only we will need to add @ResponseBody as well for the serialization of object.
@@ -38,4 +38,5 @@ public class SimpleBookRestController {
 }
 
 ```
+@RequestMapping is just to add root level path, request will still work if we remove this and only using @GetMapping etc.
 ***
