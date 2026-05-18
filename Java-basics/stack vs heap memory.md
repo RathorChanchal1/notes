@@ -35,5 +35,13 @@ This is also why memory leaks in Java happen on the Heap — you hold a referenc
 
 ---
 
+## Interactive visualizer
+
+Step through stack frames and heap objects as methods call each other — click each step to see what lands on the stack vs the heap.
+
+<!-- embed: Java-basics/heap_stack_memory_explainer.html -->
+
+---
+
 ## What is "Memory Fragmentation"?
 Memory fragmentation occurs during memory allocation when the OS assigns heap memory to a program. Because of dynamic memory allocation, the heap is divided into small pieces, leaving many empty spaces in between the allocated memory. We cannot fit other data into these gaps because the remaining spaces are too small. This is what is called memory fragmentation.

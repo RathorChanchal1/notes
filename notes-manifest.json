@@ -1,0 +1,50 @@
+{
+  "categories": [
+    {
+      "id": "learning-path",
+      "name": "Learning Path",
+      "icon": "🎯",
+      "notes": [
+        {
+          "id": "index",
+          "title": "SDE-2 Prep Checklist",
+          "file": "Index.md",
+          "type": "checklist",
+          "description": "Full interview prep roadmap with trackable items"
+        }
+      ]
+    },
+    {
+      "id": "java-basics",
+      "name": "Java Basics",
+      "icon": "☕",
+      "notes": [
+        {
+          "id": "stack-heap",
+          "title": "Stack vs Heap Memory",
+          "file": "Java-basics/stack vs heap memory.md",
+          "description": "JVM memory model with interactive step-through visualizer"
+        }
+      ]
+    },
+    {
+      "id": "springboot-basics",
+      "name": "Spring Boot",
+      "icon": "🌱",
+      "notes": [
+        {
+          "id": "controller-rest",
+          "title": "@Controller vs @RestController",
+          "file": "Springboot-basics/@Controller and @RestController.md",
+          "description": "When to use each and @ResponseBody"
+        },
+        {
+          "id": "stereotypes",
+          "title": "@Component vs @Repository vs @Service",
+          "file": "Springboot-basics/@Component vs @Repository and @Service.md",
+          "description": "Spring stereotypes and why they matter"
+        }
+      ]
+    }
+  ]
+}

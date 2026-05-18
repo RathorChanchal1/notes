@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study Notes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a class="brand" href="#/" id="brand-home">
+            <div class="brand-icon">📚</div>
+            <div>
+              <h1>Study Notes</h1>
+              <span>Java & Spring prep</span>
+            </div>
+          </a>
+        </div>
+        <div class="search-wrap">
+          <input type="search" id="search" placeholder="Search topics…" autocomplete="off" />
+        </div>
+        <nav class="nav-scroll" id="nav-scroll" aria-label="Notes navigation"></nav>
+        <div class="sidebar-footer">Progress saves locally in your browser.</div>
+      </aside>
+
+      <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+      <main class="main">
+        <header class="topbar">
+          <button type="button" class="menu-btn" id="menu-btn" aria-label="Open menu">☰</button>
+          <span>Study Notes</span>
+        </header>
+        <div class="content" id="content"></div>
+      </main>
+
+      <aside class="toc" id="toc" aria-label="On this page">
+        <div class="toc-title">On this page</div>
+        <nav id="toc-list"></nav>
+      </aside>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>

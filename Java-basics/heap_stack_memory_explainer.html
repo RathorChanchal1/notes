@@ -1,7 +1,36 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Stack & Heap Visualizer</title>
 <style>
+  :root {
+    --font-sans: system-ui, -apple-system, sans-serif;
+    --font-mono: ui-monospace, monospace;
+    --color-text-primary: #e8eaef;
+    --color-text-secondary: #8b93a7;
+    --color-text-info: #6ee7b7;
+    --color-text-warning: #fbbf24;
+    --color-text-success: #34d399;
+    --color-background-primary: #0f1117;
+    --color-background-secondary: #161922;
+    --color-background-info: rgba(110, 231, 183, 0.12);
+    --color-background-warning: rgba(251, 191, 36, 0.15);
+    --color-background-success: rgba(52, 211, 153, 0.12);
+    --color-border-secondary: #2a3042;
+    --color-border-tertiary: #2a3042;
+    --color-border-info: rgba(110, 231, 183, 0.35);
+    --border-radius-md: 8px;
+    --border-radius-lg: 10px;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font-sans); }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-background-primary);
+    color: var(--color-text-primary);
+    padding: 1rem;
+  }
   .container { padding: 1rem 0; }
   .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
   .step-btn { padding: 6px 14px; font-size: 13px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; transition: all .15s; }
@@ -46,6 +75,8 @@
   @keyframes pop { 0%{transform:scale(1)} 30%{transform:scale(1.03)} 100%{transform:scale(1)} }
   .ref-line { font-size: 10px; color: var(--color-text-warning); font-family: var(--font-mono); }
 </style>
+</head>
+<body>
 
 <div class="container">
   <div class="controls" id="step-tabs"></div>
@@ -290,3 +321,5 @@ function go(idx) {
 
 init();
 </script>
+</body>
+</html>
