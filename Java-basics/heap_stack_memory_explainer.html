@@ -1,0 +1,292 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .container { padding: 1rem 0; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .step-btn { padding: 6px 14px; font-size: 13px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; transition: all .15s; }
+  .step-btn:hover { background: var(--color-background-secondary); }
+  .step-btn.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+  .step-btn:disabled { opacity: .4; cursor: not-allowed; }
+  .nav { display: flex; gap: 8px; align-items: center; }
+  .nav button { padding: 6px 16px; font-size: 13px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); cursor: pointer; }
+  .nav button:hover { background: var(--color-background-secondary); }
+  .nav button:disabled { opacity: .35; cursor: not-allowed; }
+  .step-count { font-size: 12px; color: var(--color-text-secondary); }
+  .desc-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin-bottom: 1.25rem; border-left: 3px solid var(--color-border-info); }
+  .desc-card .label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; letter-spacing: .5px; text-transform: uppercase; }
+  .desc-card .text { font-size: 14px; color: var(--color-text-primary); line-height: 1.6; }
+  .mem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .mem-col { border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); overflow: hidden; }
+  .col-header { padding: 10px 14px; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .col-header .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .col-header .badge { font-size: 10px; padding: 2px 7px; border-radius: 10px; margin-left: auto; }
+  .stack-area { min-height: 320px; padding: 10px; display: flex; flex-direction: column-reverse; gap: 6px; background: var(--color-background-primary); position: relative; }
+  .heap-area { min-height: 320px; padding: 10px; display: flex; flex-direction: column; gap: 6px; background: var(--color-background-primary); }
+  .frame { border-radius: 6px; padding: 8px 10px; border: 0.5px solid; transition: all .3s; }
+  .frame.active { border-width: 1.5px; }
+  .frame .fn { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .frame .vars { font-size: 11px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 2px; }
+  .frame .var-row { display: flex; gap: 6px; align-items: center; }
+  .frame .var-name { font-family: var(--font-mono); }
+  .frame .var-val { font-family: var(--font-mono); padding: 0 5px; border-radius: 3px; font-size: 10px; }
+  .frame .ptr { background: var(--color-background-warning); color: var(--color-text-warning); border-radius: 3px; font-size: 9px; padding: 1px 4px; margin-left: auto; }
+  .heap-obj { border-radius: 6px; padding: 8px 10px; border: 0.5px solid; transition: all .3s; }
+  .heap-obj .addr { font-size: 10px; font-family: var(--font-mono); margin-bottom: 4px; }
+  .heap-obj .fields { font-size: 11px; display: flex; flex-direction: column; gap: 3px; }
+  .heap-obj .field { display: flex; gap: 6px; }
+  .heap-obj .fk { color: var(--color-text-secondary); font-family: var(--font-mono); }
+  .heap-obj .fv { font-family: var(--font-mono); }
+  .empty-hint { font-size: 12px; color: var(--color-text-secondary); text-align: center; padding: 40px 0; }
+  .sp-arrow { font-size: 10px; color: var(--color-text-secondary); text-align: right; padding-right: 4px; }
+  .legend { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--color-text-secondary); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+  .highlight { animation: pop .4s ease; }
+  @keyframes pop { 0%{transform:scale(1)} 30%{transform:scale(1.03)} 100%{transform:scale(1)} }
+  .ref-line { font-size: 10px; color: var(--color-text-warning); font-family: var(--font-mono); }
+</style>
+
+<div class="container">
+  <div class="controls" id="step-tabs"></div>
+  <div class="desc-card">
+    <div class="label">What's happening</div>
+    <div class="text" id="desc-text">Click a step above to begin.</div>
+  </div>
+  <div class="mem-grid">
+    <div class="mem-col">
+      <div class="col-header">
+        <div class="dot" style="background:#378ADD"></div>
+        <span style="color:var(--color-text-primary)">Stack memory</span>
+        <span class="badge" style="background:var(--color-background-info);color:var(--color-text-info)">LIFO</span>
+      </div>
+      <div class="stack-area" id="stack-area">
+        <div class="empty-hint">Stack is empty</div>
+      </div>
+      <div style="padding:6px 10px;background:var(--color-background-secondary);border-top:0.5px solid var(--color-border-tertiary)">
+        <div class="sp-arrow" id="sp-label" style="color:var(--color-text-secondary);font-size:11px">SP → top of stack</div>
+      </div>
+    </div>
+    <div class="mem-col">
+      <div class="col-header">
+        <div class="dot" style="background:#1D9E75"></div>
+        <span style="color:var(--color-text-primary)">Heap memory</span>
+        <span class="badge" style="background:var(--color-background-success);color:var(--color-text-success)">dynamic</span>
+      </div>
+      <div class="heap-area" id="heap-area">
+        <div class="empty-hint">Heap is empty</div>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#E6F1FB;border:1px solid #378ADD"></div> Stack frame</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E1F5EE;border:1px solid #1D9E75"></div> Heap object</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--color-background-warning);border:0.5px solid var(--color-border-warning)"></div> Pointer / reference</div>
+  </div>
+</div>
+
+<script>
+const steps = [
+  {
+    label: "1. JVM starts",
+    desc: "The JVM (Java Virtual Machine) boots up. The OS gives it a chunk of RAM split into two regions: the Stack (for function calls) and the Heap (for objects). Both are completely empty. Nothing has run yet.",
+    stack: [],
+    heap: []
+  },
+  {
+    label: "2. main() called",
+    desc: "The JVM calls main(). A new stack frame is pushed onto the Stack. This frame holds local variables for main(). The Stack Pointer (SP) now points to this frame as the 'current' execution context.",
+    stack: [
+      { fn: "main()", active: true, vars: [{ name: "args", val: "String[]", ptr: "0x1A00" }] }
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" }
+    ]
+  },
+  {
+    label: "3. int declared",
+    desc: "Inside main(), we write: int counter = 0. Primitives like int, boolean, double live DIRECTLY on the Stack frame — not on the Heap. The value 0 is stored right there inside the frame. No heap allocation needed.",
+    stack: [
+      { fn: "main()", active: true, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" }
+    ]
+  },
+  {
+    label: "4. new User() created",
+    desc: "We write: User u = new User('Alice', 30). The keyword 'new' triggers heap allocation. The User object is created on the Heap at address 0x2B40. The variable u on the Stack stores ONLY the memory address (reference/pointer) — not the object itself.",
+    stack: [
+      { fn: "main()", active: true, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true },
+        { name: "u", val: "→ 0x2B40", ptr: "0x2B40" }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" },
+      { addr: "0x2B40", type: "User", fields: { name: '"Alice"', age: "30" }, color: "teal" }
+    ]
+  },
+  {
+    label: "5. greet() called",
+    desc: "main() calls greet(u). A new stack frame is pushed ON TOP of main's frame. The parameter 'user' in greet() receives a COPY of the reference (0x2B40) — both main's 'u' and greet's 'user' point to the same User object on the Heap.",
+    stack: [
+      { fn: "main()", active: false, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true },
+        { name: "u", val: "→ 0x2B40", ptr: "0x2B40" }
+      ]},
+      { fn: "greet()", active: true, vars: [
+        { name: "user", val: "→ 0x2B40", ptr: "0x2B40" },
+        { name: "msg", val: '""', prim: true }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" },
+      { addr: "0x2B40", type: "User", fields: { name: '"Alice"', age: "30" }, color: "teal", hot: true }
+    ]
+  },
+  {
+    label: "6. String created in greet()",
+    desc: "greet() creates: String msg = 'Hello, Alice!'. String objects also live on the Heap (0x3C90). The variable msg on greet's stack frame holds a reference to it. Stack grows upward; Heap grows from allocated addresses.",
+    stack: [
+      { fn: "main()", active: false, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true },
+        { name: "u", val: "→ 0x2B40", ptr: "0x2B40" }
+      ]},
+      { fn: "greet()", active: true, vars: [
+        { name: "user", val: "→ 0x2B40", ptr: "0x2B40" },
+        { name: "msg", val: "→ 0x3C90", ptr: "0x3C90" }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" },
+      { addr: "0x2B40", type: "User", fields: { name: '"Alice"', age: "30" }, color: "teal" },
+      { addr: "0x3C90", type: "String", fields: { value: '"Hello, Alice!"' }, color: "purple", hot: true }
+    ]
+  },
+  {
+    label: "7. greet() returns",
+    desc: "greet() finishes. Its stack frame is INSTANTLY and AUTOMATICALLY popped off the stack. The local variables 'user' and 'msg' are gone. The String at 0x3C90 is now unreferenced — the Garbage Collector will eventually reclaim it. The Heap object at 0x2B40 (User) survives because main() still holds a reference.",
+    stack: [
+      { fn: "main()", active: true, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true },
+        { name: "u", val: "→ 0x2B40", ptr: "0x2B40" }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" },
+      { addr: "0x2B40", type: "User", fields: { name: '"Alice"', age: "30" }, color: "teal" },
+      { addr: "0x3C90", type: "String", fields: { value: '"Hello, Alice!"' }, color: "gray", stale: true }
+    ]
+  },
+  {
+    label: "8. GC collects",
+    desc: "Garbage Collector runs. It sees 0x3C90 has NO references pointing to it — it's unreachable. The memory is freed. This is the key difference: Stack memory is freed IMMEDIATELY when a method returns (automatic). Heap memory is freed LATER by the GC (managed). That's why objects with long lifetimes go on the Heap.",
+    stack: [
+      { fn: "main()", active: true, vars: [
+        { name: "args", val: "String[]", ptr: "0x1A00" },
+        { name: "counter", val: "0", prim: true },
+        { name: "u", val: "→ 0x2B40", ptr: "0x2B40" }
+      ]}
+    ],
+    heap: [
+      { addr: "0x1A00", type: "String[]", fields: { length: "0" }, color: "amber" },
+      { addr: "0x2B40", type: "User", fields: { name: '"Alice"', age: "30" }, color: "teal" }
+    ]
+  },
+  {
+    label: "9. main() returns",
+    desc: "main() finishes. Its frame is popped. 'u' is gone from Stack — the User object at 0x2B40 now has zero references. args at 0x1A00 is also unreferenced. The Stack is completely empty. GC will reclaim the remaining Heap objects. Program ends.",
+    stack: [],
+    heap: []
+  }
+];
+
+let current = 0;
+
+function colorOf(c) {
+  const map = {
+    teal: { bg: '#E1F5EE', border: '#1D9E75', text: '#085041', addr: '#0F6E56' },
+    amber: { bg: '#FAEEDA', border: '#BA7517', text: '#633806', addr: '#854F0B' },
+    purple: { bg: '#EEEDFE', border: '#534AB7', text: '#26215C', addr: '#3C3489' },
+    gray: { bg: 'var(--color-background-secondary)', border: 'var(--color-border-secondary)', text: 'var(--color-text-secondary)', addr: 'var(--color-text-secondary)' }
+  };
+  return map[c] || map.teal;
+}
+
+function render(idx) {
+  const s = steps[idx];
+  document.getElementById('desc-text').textContent = s.desc;
+
+  // Stack
+  const sa = document.getElementById('stack-area');
+  if (!s.stack.length) {
+    sa.innerHTML = '<div class="empty-hint">Stack is empty</div>';
+  } else {
+    sa.innerHTML = s.stack.map((f, fi) => {
+      const isTop = fi === s.stack.length - 1;
+      return `<div class="frame highlight" style="background:${f.active ? '#E6F1FB' : 'var(--color-background-secondary)'};border-color:${f.active ? '#378ADD' : 'var(--color-border-tertiary)'};border-width:${f.active ? '1.5px' : '0.5px'}">
+        ${isTop ? '<div style="font-size:9px;color:#378ADD;margin-bottom:2px;font-family:var(--font-mono)">← SP (top)</div>' : ''}
+        <div class="fn" style="color:${f.active ? '#0C447C' : 'var(--color-text-secondary)'}">${f.fn}</div>
+        <div class="vars">${(f.vars||[]).map(v => `
+          <div class="var-row">
+            <span class="var-name" style="color:var(--color-text-secondary)">${v.name}</span>
+            <span style="color:var(--color-text-primary);font-family:var(--font-mono);font-size:11px">=</span>
+            <span class="var-val" style="background:${v.ptr ? 'var(--color-background-warning)' : (v.prim ? 'var(--color-background-success)' : 'var(--color-background-secondary)')};color:${v.ptr ? 'var(--color-text-warning)' : (v.prim ? 'var(--color-text-success)' : 'var(--color-text-primary)')}">${v.val}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Heap
+  const ha = document.getElementById('heap-area');
+  if (!s.heap.length) {
+    ha.innerHTML = '<div class="empty-hint">Heap is empty</div>';
+  } else {
+    ha.innerHTML = s.heap.map(o => {
+      const c = colorOf(o.color);
+      return `<div class="heap-obj highlight" style="background:${o.stale ? 'var(--color-background-secondary)' : c.bg};border-color:${o.stale ? 'var(--color-border-tertiary)' : c.border};opacity:${o.stale ? '.45' : '1'}">
+        <div class="addr" style="color:${c.addr}">${o.addr} — ${o.type}${o.stale ? ' (unreachable)' : ''}</div>
+        <div class="fields">${Object.entries(o.fields).map(([k,v]) => `
+          <div class="field">
+            <span class="fk">${k}:</span>
+            <span class="fv" style="color:${c.text}">${v}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Tabs
+  document.querySelectorAll('.step-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === idx);
+  });
+
+  document.getElementById('sp-label').textContent = s.stack.length
+    ? `SP → ${s.stack[s.stack.length-1].fn} frame`
+    : 'Stack is empty';
+}
+
+function init() {
+  const tabs = document.getElementById('step-tabs');
+  tabs.innerHTML = steps.map((s, i) =>
+    `<button class="step-btn" onclick="go(${i})">${s.label}</button>`
+  ).join('');
+  render(0);
+}
+
+function go(idx) {
+  current = idx;
+  render(idx);
+}
+
+init();
+</script>
