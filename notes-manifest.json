@@ -57,6 +57,12 @@
           "title": "MongoDB Performance & Scaling",
           "file": "scaling/mongodb scaling.md",
           "description": "Connections, QPS, pooling, and when to scale MongoDB"
+        },
+        {
+          "id": "thresholds-cheat-sheet",
+          "title": "System Design Thresholds",
+          "file": "scaling/thresholds-cheat-sheet.md",
+          "description": "Visual cheat sheet + tipping points for traffic, DB, cache, queues"
         }
       ]
     }

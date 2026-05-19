@@ -142,23 +142,39 @@
   function renderWelcome() {
     hideToc();
 
-    const cards = allNotes
-      .map(
-        (n) => `
-      <button type="button" class="note-card" data-id="${n.id}">
-        <div class="cat">${n.categoryIcon} ${escapeHtml(n.categoryName)}</div>
+    const shortNotes = allNotes.filter((n) => n.type === "short");
+    const fullNotes = allNotes.filter((n) => n.type !== "short");
+
+    function cardHtml(n) {
+      const shortClass = n.type === "short" ? " note-card-short" : "";
+      const badge = n.type === "short" ? `<span class="note-badge">Short</span>` : "";
+      return `
+      <button type="button" class="note-card${shortClass}" data-id="${n.id}">
+        <div class="cat">${n.categoryIcon} ${escapeHtml(n.categoryName)} ${badge}</div>
         <h3>${escapeHtml(n.title)}</h3>
         <p>${escapeHtml(n.description || "")}</p>
-      </button>
-    `
-      )
-      .join("");
+      </button>`;
+    }
+
+    const shortSection =
+      shortNotes.length > 0
+        ? `
+        <section class="welcome-section">
+          <h3 class="section-label">⚡ Short notes</h3>
+          <p class="section-hint">Quick revision — bite-sized facts</p>
+          <div class="card-grid card-grid-short">${shortNotes.map(cardHtml).join("")}</div>
+        </section>`
+        : "";
 
     els.content.innerHTML = `
       <div class="welcome">
         <h2>Your study notes</h2>
-        <p>Concepts, checklists, and interactive explainers — pick a topic from the sidebar or below.</p>
-        <div class="card-grid">${cards}</div>
+        <p>Concepts, checklists, and quick revision — pick from the sidebar or below.</p>
+        ${shortSection}
+        <section class="welcome-section">
+          <h3 class="section-label">📚 Full notes</h3>
+          <div class="card-grid">${fullNotes.map(cardHtml).join("")}</div>
+        </section>
       </div>
     `;
 
@@ -259,11 +275,21 @@
     `;
 
     const body = $(".markdown-body", els.content);
+    resolveNoteImages(note, body);
     enhanceCodeBlocks(body);
     buildToc(body);
     if (typeof hljs !== "undefined") {
       $$("pre code", body).forEach((block) => hljs.highlightElement(block));
     }
+  }
+
+  function resolveNoteImages(note, root) {
+    const dir = note.file.includes("/") ? note.file.replace(/\/[^/]+$/, "") : "";
+    $$("img", root).forEach((img) => {
+      const src = img.getAttribute("src");
+      if (!src || /^https?:\/\//i.test(src) || src.startsWith("/")) return;
+      img.src = dir ? `${dir}/${src}` : src;
+    });
   }
 
   function renderChecklistNote(note, raw) {

@@ -58,7 +58,6 @@ You only shard when you hit one of these specific physical walls:
 ---
 
 ## Summary Sizing Guide
-
 ```text
 [ < 2,000 Write QPS & < 1 TB Data ]   ---> 1 Standalone Server or Replica Set is completely fine.
 [ > 15,000 Read QPS ]                 ---> Don't shard yet. Add Read Replicas or place a Redis cache in front.
