@@ -45,6 +45,20 @@
           "description": "Spring stereotypes and why they matter"
         }
       ]
+    },
+    {
+      "id": "scaling",
+      "name": "Scaling",
+      "icon": "📈",
+      "folder": "scaling",
+      "notes": [
+        {
+          "id": "mongodb-scaling",
+          "title": "MongoDB Performance & Scaling",
+          "file": "scaling/mongodb scaling.md",
+          "description": "Connections, QPS, pooling, and when to scale MongoDB"
+        }
+      ]
     }
   ]
 }
