@@ -1,8 +1,9 @@
 # System Design Thresholds Cheat Sheet
 
-![System design thresholds — traffic, database, cache, queues, and storage](threshold-sheet.png)
+![System design thresholds — traffic, database, cache, queues, and storage]
 
 ## 1. Traffic & Requests
+![alt text](image.png)
 
 ### Load Balancer (`~100 req/s`)
 * **Description:** A single application server typically handles up to 100–200 requests per second (RPS) for standard CRUD logic.
@@ -19,7 +20,7 @@
 ---
 
 ## 2. Database Scaling
-
+![alt text](image-1.png)
 ### Read Replicas (`~1,000 QPS`)
 * **Description:** The threshold where a single database instance gets overwhelmed by read requests.
 * **Tipping Point:** Under 500 QPS is safe for a single node. When you cross **1,000+ Read QPS**, split traffic by adding 1 or 2 Read Replicas. If reads scale exponentially beyond that, look toward a distributed DB.
@@ -35,6 +36,7 @@
 ---
 
 ## 3. Caching
+![alt text](image-2.png)
 
 ### Cache Threshold (`>10ms DB query`)
 * **Description:** The performance indicator that tells you a query is too expensive to run directly against the database every time.
@@ -51,6 +53,7 @@
 ---
 
 ## 4. Message Queues & Async
+![alt text](image-3.png)
 
 ### Queue Threshold (`>500ms work`)
 * **Description:** When to pull heavy processing tasks out of the synchronous request-response flow.
@@ -67,6 +70,7 @@
 ---
 
 ## 5. Storage & CDN
+![alt text](image-4.png)
 
 ### Object Storage (`>1 MB blobs`)
 * **Description:** Deciding whether a file belongs in a database table or external cloud storage.
